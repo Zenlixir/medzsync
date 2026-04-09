@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MedzSync</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0">
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── HOME ── -->
+  <div id="home" class="screen active">
+    <div class="header">
+      <div class="wordmark">Medz<span>Sync</span></div>
+      <div class="header-right">
+        <span id="syncStatusBadge" class="sync-badge off">Offline</span>
+        <button class="icon-btn" id="refreshBtn" aria-label="Refresh">
+          <span class="material-symbols-rounded">sync</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <span class="material-symbols-rounded search-icon">search</span>
+      <input id="searchInput" type="text" placeholder="Search medications…" autocomplete="off">
+      <button class="search-clear" id="searchClear" aria-label="Clear">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+
+    <div class="hero-card" id="heroCard">
+      <div class="hero-left">
+        <div class="hero-label">Storage Temp</div>
+        <div class="hero-temp" id="sensorTemp">--°C</div>
+        <div class="status-pill" id="sensorStatusTag">
+          <span class="material-symbols-rounded">sensors</span>
+          <span>Syncing…</span>
+        </div>
+      </div>
+      <div class="hero-ring">
+        <svg width="96" height="96" viewBox="0 0 96 96">
+          <circle cx="48" cy="48" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="7"/>
+          <circle id="humidArc" cx="48" cy="48" r="40"
+            fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="7"
+            stroke-dasharray="251.3" stroke-dashoffset="251.3"
+            stroke-linecap="round" transform="rotate(-90 48 48)"/>
+        </svg>
+        <div class="ring-center">
+          <span class="ring-val" id="sensorHumidLabel">--%</span>
+          <span class="ring-sub">humid</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-grid">
+      <div class="mini-card" id="batteryCard">
+        <div class="mini-label">Battery</div>
+        <div class="mini-val" id="batteryVal">--<span class="mini-unit">%</span></div>
+        <div class="mini-bar-track">
+          <div class="mini-bar-fill" id="batteryFill"></div>
+        </div>
+      </div>
+      <div class="mini-card" id="nextDoseCard">
+        <div class="mini-label">Next Dose</div>
+        <div class="mini-val mono" id="nextDoseTime">--:--</div>
+        <div class="mini-sub" id="nextDoseSub">Loading…</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <h3>Today's Schedule</h3>
+      <button class="fab-small" id="addMedBtn" aria-label="Add medication">
+        <span class="material-symbols-rounded">add</span>
+      </button>
+    </div>
+    <div class="pill-list" id="pillList">
+      <div class="empty-state">
+        <span class="material-symbols-rounded">medication</span>
+        <p>No schedule yet. Add a medication.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STATS ── -->
+  <div id="stats" class="screen">
+    <div class="header">
+      <div class="wordmark">Insights</div>
+    </div>
+
+    <div class="hero-card stat-hero">
+      <div class="hero-label">Adherence Rate · All Time</div>
+      <div class="stat-rate" id="adherenceRate">--<em>%</em></div>
+      <div class="stat-bar-track">
+        <div class="stat-bar-fill" id="adherenceFill"></div>
+      </div>
+    </div>
+
+    <div class="surface-card">
+      <div class="card-header-row">
+        <span class="card-label-text">Weekly Doses Taken</span>
+      </div>
+      <div class="bar-chart" id="barChart"></div>
+    </div>
+
+    <div class="chips-row" id="streakChips">
+      <div class="chip-card">
+        <div class="chip-n" id="chipStreak">--</div>
+        <div class="chip-t">Day Streak</div>
+      </div>
+      <div class="chip-card">
+        <div class="chip-n" id="chipTaken">--</div>
+        <div class="chip-t">Total Taken</div>
+      </div>
+      <div class="chip-card">
+        <div class="chip-n" id="chipMissed">--</div>
+        <div class="chip-t">Missed</div>
+      </div>
+    </div>
+
+    <div class="surface-card">
+      <div class="card-header-row">
+        <span class="card-label-text">Recent Log</span>
+      </div>
+      <div class="log-list" id="logList">
+        <div class="empty-state compact">
+          <span class="material-symbols-rounded">history</span>
+          <p>No log entries yet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SETTINGS ── -->
+  <div id="settings" class="screen">
+    <div class="header">
+      <div class="wordmark">Preferences</div>
+      <button class="icon-btn" id="devBtn" aria-label="Developer">
+        <span class="material-symbols-rounded">code</span>
+      </button>
+    </div>
+
+    <div class="section-label">Medications</div>
+    <div class="surface-card" id="scheduleList">
+      <div class="empty-state compact">
+        <span class="material-symbols-rounded">medication</span>
+        <p>No medications yet.</p>
+      </div>
+    </div>
+    <button class="add-row-btn" id="addMedBtnSettings">
+      <span class="material-symbols-rounded">add_circle</span>
+      Add Medication
+    </button>
+
+    <div class="section-label">Notifications</div>
+    <div class="surface-card">
+      <div class="pref-row" data-toggle>
+        <div class="pref-info">
+          <h4>Dose Reminders</h4>
+          <p>Push notification at alarm time</p>
+        </div>
+        <div class="toggle on" id="toggleDoseReminder"></div>
+      </div>
+      <div class="pref-row" data-toggle>
+        <div class="pref-info">
+          <h4>Missed Dose Alert</h4>
+          <p>After 10 min grace period</p>
+        </div>
+        <div class="toggle on" id="toggleMissedAlert"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Device & API</div>
+    <div class="surface-card">
+      <div class="pref-row" id="apiConfigRow">
+        <div class="pref-info">
+          <h4>MedzSync (Logs API)</h4>
+          <p id="logsUrlPreview">Not configured</p>
+        </div>
+        <span class="material-symbols-rounded pref-chevron">chevron_right</span>
+      </div>
+      <div class="pref-row" id="apiConfigRow" style="cursor:pointer;" onclick="openApiConfigModal()">
+        <div class="pref-info">
+          <h4>MedzSync Ctrls (ESP32 API)</h4>
+          <p id="ctrlsUrlPreview">Not configured</p>
+        </div>
+        <span class="material-symbols-rounded pref-chevron">chevron_right</span>
+      </div>
+      <div class="pref-row" id="tempUnitRow">
+        <div class="pref-info">
+          <h4>Temperature Unit</h4>
+          <p id="tempUnitLabel">Celsius (°C)</p>
+        </div>
+        <span class="material-symbols-rounded pref-chevron">chevron_right</span>
+      </div>
+    </div>
+
+    <div class="section-label">Data</div>
+    <div class="surface-card">
+      <div class="pref-row danger-row" id="clearLogRow">
+        <div class="pref-info danger">
+          <h4>Clear All Log History</h4>
+          <p>Removes every dose record permanently</p>
+        </div>
+        <span class="material-symbols-rounded danger-icon">delete_forever</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ABOUT ── -->
+  <div id="about" class="screen">
+    <div class="header">
+      <div class="wordmark">About</div>
+    </div>
+    <div class="about-hero">
+      <div class="app-icon">
+        <span class="material-symbols-rounded">medication</span>
+      </div>
+      <h2 class="app-title">MedzSync</h2>
+      <span class="version-badge">v1.1.0</span>
+      <p class="app-desc">Smart companion for your ESP32 Medicine Box. Local-first storage with cloud log sync. Tracks doses, monitors storage conditions, and keeps you on schedule.</p>
+    </div>
+
+    <div class="surface-card about-list">
+      <div class="about-row">
+        <span class="about-key">Version</span>
+        <span class="about-val">1.1.0 (110)</span>
+      </div>
+      <div class="about-row">
+        <span class="about-key">Backend</span>
+        <span class="about-val">Google (Sheets API)</span>
+      </div>
+      <div class="about-row">
+        <span class="about-key">Device</span>
+        <span class="about-val">ESP32 - Smart Medicine Box</span>
+      </div>
+      <div class="about-row">
+        <span class="about-key">Developer</span>
+        <span class="about-val">Z.</span>
+      </div>
+    </div>
+
+    <a href="https://github.com/zenlixir" target="_blank" rel="noopener noreferrer" class="github-link-btn">
+      <span class="material-symbols-rounded">open_in_new</span>
+      View on GitHub
+    </a>
+  </div>
+
+  <!-- ── NAV ── -->
+  <nav class="nav-bar">
+    <div class="nav-item active" data-target="home">
+      <div class="nav-pill"><span class="material-symbols-rounded">home</span></div>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item" data-target="stats">
+      <div class="nav-pill"><span class="material-symbols-rounded">insights</span></div>
+      <span class="nav-label">Stats</span>
+    </div>
+    <div class="nav-item" data-target="settings">
+      <div class="nav-pill"><span class="material-symbols-rounded">tune</span></div>
+      <span class="nav-label">Prefs</span>
+    </div>
+    <div class="nav-item" data-target="about">
+      <div class="nav-pill"><span class="material-symbols-rounded">info</span></div>
+      <span class="nav-label">About</span>
+    </div>
+  </nav>
+</div>
+
+<!-- ── ADD / EDIT  ── -->
+<div id="scheduleModal" class="backdrop" role="dialog" aria-modal="true">
+  <div class="bottom-sheet" id="scheduleSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 id="modalTitle">Add Medication</h3>
+      <button class="icon-btn sm" id="modalCloseBtn" aria-label="Close">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="field-group">
+        <label class="field-label">Medication Name</label>
+        <input id="inputName" class="field-input" type="text" placeholder="e.g. Paracetamol" autocomplete="off">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Dose</label>
+        <input id="inputDose" class="field-input" type="text" placeholder="e.g. 500mg" autocomplete="off">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Time</label>
+        <div class="drum-picker" id="drumPicker">
+          <div class="drum-col" id="drumHour"></div>
+          <div class="drum-sep">:</div>
+          <div class="drum-col" id="drumMin"></div>
+          <div class="drum-col" id="drumAmpm"></div>
+          <div class="drum-highlight"></div>
+        </div>
+      </div>
+      <div class="field-row">
+        <label class="field-label-inline">Active</label>
+        <input id="inputActive" class="toggle-check" type="checkbox" checked>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="sheet-btn secondary" id="modalCancelBtn">Cancel</button>
+      <button class="sheet-btn primary"   id="modalSaveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DELETE CONFIRM MODAL ── -->
+<div id="confirmModal" class="backdrop" role="dialog" aria-modal="true">
+  <div class="bottom-sheet" id="confirmSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>Confirm</h3></div>
+    <div class="sheet-body">
+      <p class="confirm-text" id="confirmText">Are you sure?</p>
+    </div>
+    <div class="sheet-footer">
+      <button class="sheet-btn secondary" id="confirmCancelBtn">Keep It</button>
+      <button class="sheet-btn danger"    id="confirmDeleteBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TEMP UNIT MODAL ── -->
+<div id="tempUnitModal" class="backdrop" role="dialog" aria-modal="true">
+  <div class="bottom-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>Temperature Unit</h3></div>
+    <div class="sheet-body">
+      <div class="choice-list">
+        <div class="choice-item" data-unit="C">
+          <span>Celsius (°C)</span>
+          <span class="material-symbols-rounded choice-check">check</span>
+        </div>
+        <div class="choice-item" data-unit="F">
+          <span>Fahrenheit (°F)</span>
+          <span class="material-symbols-rounded choice-check">check</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── API CONFIG MODAL (dual URL) ── -->
+<div id="apiConfigModal" class="backdrop" role="dialog" aria-modal="true">
+  <div class="bottom-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3>API Endpoints</h3>
+      <button class="icon-btn sm" id="apiConfigCloseBtn" aria-label="Close">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="field-group">
+        <label class="field-label">MedzSync — Logs Sheet URL</label>
+        <input id="inputLogsUrl" class="field-input" type="url"
+          placeholder="https://script.google.com/macros/s/…/exec"
+          autocomplete="off" spellcheck="false">
+      </div>
+      <p class="api-hint">Receives dose logs &amp; sensor history. Sheet: <strong>MedzSync</strong></p>
+      <div class="field-group">
+        <label class="field-label">MedzSync Ctrls — ESP32 Control URL</label>
+        <input id="inputCtrlsUrl" class="field-input" type="url"
+          placeholder="https://script.google.com/macros/s/…/exec"
+          autocomplete="off" spellcheck="false">
+      </div>
+      <p class="api-hint">ESP32 reads commands here. Sheet: <strong>MedzSync Ctrls</strong></p>
+    </div>
+    <div class="sheet-footer">
+      <button class="sheet-btn secondary" id="apiConfigCancelBtn">Cancel</button>
+      <button class="sheet-btn primary"   id="apiConfigSaveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -89,6 +89,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 18px 0 14px;
+  padding-top: calc(18px + env(safe-area-inset-top));
   position: sticky;
   top: 0;
   z-index: 10;
